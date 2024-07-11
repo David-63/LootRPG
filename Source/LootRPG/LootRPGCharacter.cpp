@@ -13,6 +13,7 @@
 
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
+#include "Online/OnlineSessionNames.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -21,6 +22,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ALootRPGCharacter::ALootRPGCharacter()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
+	, FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionsComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -104,23 +106,65 @@ void ALootRPGCharacter::CreateGameSession()
 
 	const ULocalPlayer* localPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	OnlineSessionInterface->CreateSession(*localPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *sessionSettings);
+
+}
+
+void ALootRPGCharacter::JoinGameSession()
+{
+	// Find game session
+	if (!OnlineSessionInterface.IsValid())
+	{
+		return;
+	}
+	
+	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
+
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	SessionSearch->MaxSearchResults = 10000;
+	SessionSearch->bIsLanQuery = false;
+	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);	
+	
+	const ULocalPlayer* localPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->FindSessions(*localPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
+
 }
 
 void ALootRPGCharacter::OnCreateSessionComplete(FName _sessionName, bool _successful)
 {
+	if (nullptr == GEngine)
+	{
+		return;
+	}
 	if (_successful)
 	{
-		if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Create session : %s"), *_sessionName.ToString()));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to create session")));
+	}
+}
+
+void ALootRPGCharacter::OnFindSessionsComplete(bool _successful)
+{
+	if (nullptr == GEngine)
+	{
+		return;
+	}
+
+	if (_successful)
+	{
+		for (auto result : SessionSearch->SearchResults)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Create session : %s"), *_sessionName.ToString()));
+			FString id = result.GetSessionIdStr();
+			FString user = result.Session.OwningUserName;
+
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Id : %s, User : %s"), *id, *user));
 		}
 	}
 	else
 	{
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to create session")));
-		}
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to join session")));
 	}
 }
 
