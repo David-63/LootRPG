@@ -10,7 +10,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -59,30 +58,6 @@ void ALootRPGCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-}
-
-void ALootRPGCharacter::OpenLobby()
-{
-	UWorld* world = GetWorld();
-	if (world)
-	{
-		world->ServerTravel("Game/ThirdPerson/Maps/Lobby?listen");
-	}
-}
-
-void ALootRPGCharacter::CallOpenLevel(const FString& _address)
-{
-	UGameplayStatics::OpenLevel(this, *_address);	
-}
-
-void ALootRPGCharacter::CallClientTravel(const FString& _address)
-{
-	APlayerController* playerController = GetGameInstance()->GetFirstLocalPlayerController();
-	
-	if (playerController)
-	{
-		playerController->ClientTravel(_address, ETravelType::TRAVEL_Absolute);
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
