@@ -12,7 +12,7 @@
 #include "InputActionValue.h"
 
 #include "OnlineSubsystem.h"
-#include "Interfaces/OnlineSessionInterface.h"
+#include "OnlineSessionSettings.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -20,6 +20,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // ALootRPGCharacter
 
 ALootRPGCharacter::ALootRPGCharacter()
+	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -74,6 +75,53 @@ void ALootRPGCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void ALootRPGCharacter::CreateGameSession()
+{
+	// Called when pressing the 1 key
+	if (!OnlineSessionInterface.IsValid())
+	{
+		return;
+	}
+
+	auto existingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession);
+	if (nullptr != existingSession)
+	{
+		OnlineSessionInterface->DestroySession(NAME_GameSession);
+	}
+
+	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
+
+	TSharedPtr<FOnlineSessionSettings> sessionSettings = MakeShareable(new FOnlineSessionSettings());
+	sessionSettings->bIsLANMatch = false;
+	sessionSettings->NumPublicConnections = 4;
+	sessionSettings->bAllowJoinInProgress = true;
+	sessionSettings->bAllowJoinViaPresence = true;
+	sessionSettings->bShouldAdvertise = true;
+	sessionSettings->bUsesPresence = true;
+	sessionSettings->bUseLobbiesIfAvailable = true;
+
+	const ULocalPlayer* localPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	OnlineSessionInterface->CreateSession(*localPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *sessionSettings);
+}
+
+void ALootRPGCharacter::OnCreateSessionComplete(FName _sessionName, bool _successful)
+{
+	if (_successful)
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Create session : %s"), *_sessionName.ToString()));
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to create session")));
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
