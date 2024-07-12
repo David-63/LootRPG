@@ -23,6 +23,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 ALootRPGCharacter::ALootRPGCharacter()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
 	, FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionsComplete))
+	, JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplete))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -103,7 +104,7 @@ void ALootRPGCharacter::CreateGameSession()
 	sessionSettings->bShouldAdvertise = true;
 	sessionSettings->bUsesPresence = true;
 	sessionSettings->bUseLobbiesIfAvailable = true;
-
+	sessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 	const ULocalPlayer* localPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	OnlineSessionInterface->CreateSession(*localPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *sessionSettings);
 
@@ -138,6 +139,13 @@ void ALootRPGCharacter::OnCreateSessionComplete(FName _sessionName, bool _succes
 	if (_successful)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Create session : %s"), *_sessionName.ToString()));
+
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			world->ServerTravel(FString("/Game/ThirdPerson/Maps/Lobby?listen"));
+		}
+		
 	}
 	else
 	{
@@ -151,20 +159,51 @@ void ALootRPGCharacter::OnFindSessionsComplete(bool _successful)
 	{
 		return;
 	}
-
-	if (_successful)
+	if (!OnlineSessionInterface.IsValid())
 	{
-		for (auto result : SessionSearch->SearchResults)
-		{
-			FString id = result.GetSessionIdStr();
-			FString user = result.Session.OwningUserName;
+		return;
+	}
 
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Id : %s, User : %s"), *id, *user));
+	for (auto result : SessionSearch->SearchResults)
+	{
+		FString id = result.GetSessionIdStr();
+		FString user = result.Session.OwningUserName;
+
+		FString matchType;
+		result.Session.SessionSettings.Get(FName("MatchType"), matchType);
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Id : %s, User : %s"), *id, *user));
+
+		if (FName("FreeForAll") == matchType)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Joining match type: %s"), *matchType));
+			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
+			const ULocalPlayer* localPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+			OnlineSessionInterface->JoinSession(*localPlayer->GetPreferredUniqueNetId(), NAME_GameSession, result);
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to join session")));
 		}
 	}
-	else
+
+}
+
+void ALootRPGCharacter::OnJoinSessionComplete(FName _sessionName, EOnJoinSessionCompleteResult::Type _result)
+{
+	if (!OnlineSessionInterface.IsValid())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString(TEXT("Failed to join session")));
+		return;
+	}
+	FString address;
+	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, address))
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("Connect string: %s"), *address));
+
+		APlayerController* playerController = GetGameInstance()->GetFirstLocalPlayerController();
+		if (playerController)
+		{
+			playerController->ClientTravel(address, ETravelType::TRAVEL_Absolute);
+		}
 	}
 }
 
