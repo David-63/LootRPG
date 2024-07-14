@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Menu.generated.h"
 
+class UButton;
 /**
  * 
  */
@@ -17,4 +18,21 @@ class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable)
 	void MenuSetup();
+
+protected:
+	virtual bool Initialize();
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	UButton* HostBtn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* JoinBtn;
+
+	UFUNCTION()
+	void HostBtnClicked();
+	UFUNCTION()
+	void JoinBtnClicked();
+
+	// The subsystem designed to handle all online session functionality
+	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
 };
