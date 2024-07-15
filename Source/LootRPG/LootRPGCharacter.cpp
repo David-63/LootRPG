@@ -63,15 +63,8 @@ ALootRPGCharacter::ALootRPGCharacter()
 	IOnlineSubsystem* onlineSubsystem = IOnlineSubsystem::Get();
 	if (onlineSubsystem)
 	{
-		OnlineSessionInterface = onlineSubsystem->GetSessionInterface();
-
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found subsystem %s"), *onlineSubsystem->GetSubsystemName().ToString()));
-
-		}
+		OnlineSessionInterface = onlineSubsystem->GetSessionInterface();		
 	}
-
 }
 
 void ALootRPGCharacter::BeginPlay()
