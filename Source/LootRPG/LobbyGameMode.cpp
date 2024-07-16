@@ -20,7 +20,7 @@ void ALobbyGameMode::PostLogin(APlayerController* _newPlayer)
 			if (playerState)
 			{
 				FString playerName = playerState->GetPlayerName();
-				GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Cyan, FString::Printf(TEXT("%d has joined the game"), *playerName));
+				GEngine->AddOnScreenDebugMessage(2, 60.f, FColor::Cyan, FString::Printf(TEXT("%d has joined the game"), *playerName));
 			}
 		}
 	}
@@ -29,7 +29,7 @@ void ALobbyGameMode::PostLogin(APlayerController* _newPlayer)
 void ALobbyGameMode::Logout(AController* _exiting)
 {
 	Super::Logout(_exiting);
-		
+
 	APlayerState* playerState = _exiting->GetPlayerState<APlayerState>();
 	if (playerState)
 	{
@@ -38,7 +38,7 @@ void ALobbyGameMode::Logout(AController* _exiting)
 
 
 		FString playerName = playerState->GetPlayerName();
-		GEngine->AddOnScreenDebugMessage(-1, 60.f, FColor::Cyan, FString::Printf(TEXT("%d has joined the game"), *playerName));
+		GEngine->AddOnScreenDebugMessage(2, 60.f, FColor::Cyan, FString::Printf(TEXT("%d has exited the game"), *playerName));
 	}
 
 }
