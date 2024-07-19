@@ -20,6 +20,8 @@ private:
 	class USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleAnywhere, Category = "User Camera")
 	class UCameraComponent* FollowCamera;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UWidgetComponent* OverheadWidget;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
@@ -37,12 +39,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-protected:
-	/** Called for movement input */
-	void Move(const FInputActionValue& _value);
 
-	/** Called for looking input */
-	void Look(const FInputActionValue& _value);
 
 
 public:
@@ -60,5 +57,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+protected:
+	/** Called for movement input */
+	void Move(const FInputActionValue& _value);
 
+	/** Called for looking input */
+	void Look(const FInputActionValue& _value);
 };
