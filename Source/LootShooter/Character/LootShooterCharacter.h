@@ -22,25 +22,30 @@ private:
 	class UCameraComponent* FollowCamera;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverheadWidget;
-
-	/** MappingContext */
+		
+	/*
+	* Input Action
+	*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
-
-	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
-
-	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-
-	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
 
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	class AWeapon* OverlappingWeapon;
 
+private:
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(AWeapon* _lastWeapon);
+
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
+	void SetOverlappingWeapon(AWeapon* _weapon);
 
 public:
 	// Sets default values for this character's properties

@@ -36,6 +36,12 @@ private:
 protected:
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* _overlappedComponent, AActor* _otherActor, UPrimitiveComponent* _otherComponent, int32 _otherBodyIndex, bool _bFromSweep, const FHitResult& _sweepResult);
+	UFUNCTION()
+	void OnSphereEndOverlap(UPrimitiveComponent* _overlappedComponent, AActor* _otherActor, UPrimitiveComponent* _otherComponent, int32 _otherBodyIndex);
+
+public:
+	void ShowPickupWidget(bool _showWidget);
+
 
 public:	
 	// Sets default values for this actor's properties

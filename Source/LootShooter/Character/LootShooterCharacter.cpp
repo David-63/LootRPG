@@ -11,6 +11,8 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "LootShooter/Weapon/Weapon.h"
 
 // Sets default values
 ALootShooterCharacter::ALootShooterCharacter()
@@ -34,6 +36,12 @@ ALootShooterCharacter::ALootShooterCharacter()
 	OverheadWidget->SetupAttachment(RootComponent);
 }
 
+void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ALootShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
+}
+
 // Called when the game starts or when spawned
 void ALootShooterCharacter::BeginPlay()
 {
@@ -45,6 +53,7 @@ void ALootShooterCharacter::BeginPlay()
 void ALootShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 }
 
@@ -113,5 +122,33 @@ void ALootShooterCharacter::Look(const FInputActionValue& _value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(lookAxisVector.X);
 		AddControllerPitchInput(lookAxisVector.Y);
+	}
+}
+
+void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(false);
+	}
+	OverlappingWeapon = _weapon;
+	if (IsLocallyControlled())
+	{
+		if (OverlappingWeapon)
+		{
+			OverlappingWeapon->ShowPickupWidget(true);
+		}
+	}
+}
+
+void ALootShooterCharacter::OnRep_OverlappingWeapon(AWeapon* _lastWeapon)
+{
+	if (OverlappingWeapon)
+	{
+		OverlappingWeapon->ShowPickupWidget(true);
+	}
+	if (_lastWeapon)
+	{
+		_lastWeapon->ShowPickupWidget(false);
 	}
 }
