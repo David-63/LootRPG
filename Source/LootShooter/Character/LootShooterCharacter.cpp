@@ -13,6 +13,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "LootShooter/Weapon/Weapon.h"
+#include "LootShooter/ShooterComponents/CombatComponent.h"
 
 // Sets default values
 ALootShooterCharacter::ALootShooterCharacter()
@@ -34,6 +35,10 @@ ALootShooterCharacter::ALootShooterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
+	Combat->SetIsReplicated(true);
+
 }
 
 void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -73,21 +78,27 @@ void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 	// Set up action bindings
 	if (UEnhancedInputComponent* enhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 		
-		// Jumping
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		// Moving
 		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Move);
-
-		// Looking
 		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Look);
+		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Started, this, &ALootShooterCharacter::Interaction);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
+void ALootShooterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
+}
+
 
 void ALootShooterCharacter::Move(const FInputActionValue& _value)
 {
@@ -123,6 +134,11 @@ void ALootShooterCharacter::Look(const FInputActionValue& _value)
 		AddControllerYawInput(lookAxisVector.X);
 		AddControllerPitchInput(lookAxisVector.Y);
 	}
+}
+
+void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
+{
+
 }
 
 void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)

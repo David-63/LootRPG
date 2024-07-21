@@ -34,32 +34,31 @@ private:
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractiveAction;
 
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
+	UPROPERTY(VisibleAnywhere)
+	class UCombatComponent* Combat;
 
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _lastWeapon);
 
 public:
+	virtual void PostInitializeComponents() override;
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
 	void SetOverlappingWeapon(AWeapon* _weapon);
 
+
 public:
-	// Sets default values for this character's properties
 	ALootShooterCharacter();
-
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
@@ -68,4 +67,6 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& _value);
+
+	void Interaction(const FInputActionValue& _value);
 };
