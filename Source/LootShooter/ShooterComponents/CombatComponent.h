@@ -16,7 +16,7 @@ class LOOTSHOOTER_API UCombatComponent : public UActorComponent
 	friend class ALootShooterCharacter;
 private:
 	class ALootShooterCharacter* Character;
-	class AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeapon;
 
 public:
 	void EquipWeapon(AWeapon* _weaponToEquip);
