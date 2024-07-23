@@ -38,6 +38,8 @@ private:
 	UInputAction* InteractiveAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* CrouchAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
@@ -58,6 +60,8 @@ public:
 	// Weapon에 의해 호출됨
 	void SetOverlappingWeapon(AWeapon* _weapon);
 	bool IsWeaponEquipped();
+	bool IsAiming();
+
 
 public:
 	ALootShooterCharacter();
@@ -75,4 +79,5 @@ protected:
 	/** Called for Interaction input */
 	void InputInteraction(const FInputActionValue& _value);
 	void InputCrouch(const FInputActionValue& _value);
+	void InputAim(const FInputActionValue& _value);
 };

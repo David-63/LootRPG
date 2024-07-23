@@ -18,6 +18,13 @@ private:
 	class ALootShooterCharacter* Character;
 	UPROPERTY(Replicated)
 	AWeapon* EquippedWeapon;
+	UPROPERTY(Replicated)
+	bool bIsAiming;
+
+protected:
+	void SetAiming(bool _bIsAiming);
+	UFUNCTION(Server, Reliable)
+	void ServerSetAiming(bool _bIsAiming);
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;

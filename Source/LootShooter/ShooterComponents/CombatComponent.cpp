@@ -22,10 +22,22 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UCombatComponent::SetAiming(bool _bIsAiming)
+{
+	bIsAiming = _bIsAiming;
+	ServerSetAiming(_bIsAiming);
+}
+void UCombatComponent::ServerSetAiming_Implementation(bool _bIsAiming)
+{
+	bIsAiming = _bIsAiming;
+}
+
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, bIsAiming);
+
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* _weaponToEquip)

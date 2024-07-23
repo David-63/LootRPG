@@ -25,8 +25,9 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 	FVector velocity = LootShooterCharacter->GetVelocity();
 	velocity.Z = 0.f;
 	MoveSpeed = velocity.Size();
-	IsInAir = LootShooterCharacter->GetCharacterMovement()->IsFalling();
-	IsAccelerating = LootShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
-	IsCrouched = LootShooterCharacter->bIsCrouched;
-	IsWeaponEquipped = LootShooterCharacter->IsWeaponEquipped();
+	bIsInAir = LootShooterCharacter->GetCharacterMovement()->IsFalling();
+	bIsAccelerating = LootShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
+	bIsCrouched = LootShooterCharacter->bIsCrouched;
+	bIsWeaponEquipped = LootShooterCharacter->IsWeaponEquipped();
+	bIsAiming = LootShooterCharacter->IsAiming();
 }

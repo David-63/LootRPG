@@ -43,7 +43,7 @@ ALootShooterCharacter::ALootShooterCharacter()
 void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME_CONDITION(ALootShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ALootShooterCharacter, OverlappingWeapon, COND_OwnerOnly);	
 }
 
 void ALootShooterCharacter::BeginPlay()
@@ -75,6 +75,7 @@ void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputLook);
 		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputInteraction);
 		enhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputCrouch);
+		enhancedInputComponent->BindAction(AimAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputAim);
 	}
 	else
 	{
@@ -155,6 +156,14 @@ void ALootShooterCharacter::InputCrouch(const FInputActionValue& _value)
 	}
 }
 
+void ALootShooterCharacter::InputAim(const FInputActionValue& _value)
+{
+	if (Combat)
+	{
+		Combat->SetAiming(_value.Get<bool>());
+	}
+}
+
 void ALootShooterCharacter::ServerEquipButtonPressed_Implementation()
 {
 	// 서버에서 클라이언트로부터 요청받은 폰 객체(서버)에 오버랩 된 무기를 부착함 (클라이언트가 복사받은 폰이랑은 무관)
@@ -183,11 +192,6 @@ void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)
 	}
 }
 
-bool ALootShooterCharacter::IsWeaponEquipped()
-{
-	return (Combat && Combat->EquippedWeapon);
-}
-
 void ALootShooterCharacter::OnRep_OverlappingWeapon(AWeapon* _lastWeapon)
 {
 	// 리슨서버만 호출되는듯
@@ -199,4 +203,14 @@ void ALootShooterCharacter::OnRep_OverlappingWeapon(AWeapon* _lastWeapon)
 	{
 		_lastWeapon->ShowPickupWidget(false);
 	}
+}
+
+bool ALootShooterCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
+}
+
+bool ALootShooterCharacter::IsAiming()
+{
+	return (Combat && Combat->bIsAiming);
 }

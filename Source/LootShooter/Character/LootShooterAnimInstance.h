@@ -22,17 +22,19 @@ private:
 	float MoveSpeed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
-	bool IsInAir;
+	bool bIsInAir;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
-	bool IsAccelerating;
+	bool bIsAccelerating;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
-	bool IsCrouched;
+	bool bIsCrouched;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
-	bool IsWeaponEquipped;
-
+	bool bIsWeaponEquipped;
+	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
+	bool bIsAiming;
+	
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float _deltaTime) override;
