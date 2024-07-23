@@ -36,6 +36,8 @@ private:
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractiveAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* CrouchAction;
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
@@ -67,9 +69,10 @@ public:
 
 protected:
 	/** Called for movement input */
-	void Move(const FInputActionValue& _value);
+	void InputMove(const FInputActionValue& _value);
 	/** Called for looking input */
-	void Look(const FInputActionValue& _value);
+	void InputLook(const FInputActionValue& _value);
 	/** Called for Interaction input */
-	void Interaction(const FInputActionValue& _value);
+	void InputInteraction(const FInputActionValue& _value);
+	void InputCrouch(const FInputActionValue& _value);
 };

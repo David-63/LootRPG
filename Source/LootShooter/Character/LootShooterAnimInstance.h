@@ -27,6 +27,9 @@ private:
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool IsAccelerating;
 
+	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
+	bool IsCrouched;
+
 	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
 	bool IsWeaponEquipped;
 

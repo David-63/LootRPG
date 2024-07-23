@@ -37,6 +37,7 @@ ALootShooterCharacter::ALootShooterCharacter()
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
 
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -70,9 +71,10 @@ void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Move);
-		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Look);
-		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Interaction);
+		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputMove);
+		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputLook);
+		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputInteraction);
+		enhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::InputCrouch);
 	}
 	else
 	{
@@ -89,7 +91,7 @@ void ALootShooterCharacter::PostInitializeComponents()
 }
 
 
-void ALootShooterCharacter::Move(const FInputActionValue& _value)
+void ALootShooterCharacter::InputMove(const FInputActionValue& _value)
 {
 	// input is a Vector2D
 	FVector2D movementVector = _value.Get<FVector2D>();
@@ -111,7 +113,7 @@ void ALootShooterCharacter::Move(const FInputActionValue& _value)
 		AddMovementInput(rightDirection, movementVector.X);
 	}
 }
-void ALootShooterCharacter::Look(const FInputActionValue& _value)
+void ALootShooterCharacter::InputLook(const FInputActionValue& _value)
 {
 	// input is a Vector2D
 	FVector2D lookAxisVector = _value.Get<FVector2D>();
@@ -123,7 +125,7 @@ void ALootShooterCharacter::Look(const FInputActionValue& _value)
 		AddControllerPitchInput(lookAxisVector.Y);
 	}
 }
-void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
+void ALootShooterCharacter::InputInteraction(const FInputActionValue& _value)
 {
 	// 나중에 플레이어의 상호작용 변수에 따라 행동하는 변수가 달라질 예정
 	if (Combat)
@@ -138,6 +140,18 @@ void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
 			// 클라이언트에서만 작동
 			ServerEquipButtonPressed();
 		}
+	}
+}
+
+void ALootShooterCharacter::InputCrouch(const FInputActionValue& _value)
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
 	}
 }
 
