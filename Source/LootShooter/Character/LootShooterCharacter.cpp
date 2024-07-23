@@ -127,15 +127,17 @@ void ALootShooterCharacter::Look(const FInputActionValue& _value)
 }
 void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
 {
-	// 서버에서만 작동해야함
+	// 나중에 플레이어의 상호작용 변수에 따라 행동하는 변수가 달라질 예정
 	if (Combat)
 	{
 		if (HasAuthority())
 		{
+			// 서버에서만 작동
 			Combat->EquipWeapon(OverlappingWeapon);
 		}
 		else
 		{
+			// 클라이언트에서만 작동
 			ServerEquipButtonPressed();
 		}
 	}

@@ -77,6 +77,7 @@ void AWeapon::OnRep_WeaponState()
 void AWeapon::SetWeaponState(EWeaponState _state)
 {
 	WeaponState = _state;
+
 	switch (WeaponState)
 	{
 	case EWeaponState::EWS_Equipped:
