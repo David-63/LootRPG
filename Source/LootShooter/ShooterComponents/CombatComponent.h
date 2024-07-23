@@ -15,23 +15,17 @@ class LOOTSHOOTER_API UCombatComponent : public UActorComponent
 
 	friend class ALootShooterCharacter;
 private:
-	class ALootShooterCharacter* Character;
-	AWeapon* EquippedWeapon;
+	class ALootShooterCharacter*	Character;
+	AWeapon*						EquippedWeapon;
 
 public:
 	void EquipWeapon(AWeapon* _weaponToEquip);
 
-public:	
-	// Sets default values for this component's properties
+public:
 	UCombatComponent();
-
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
+public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+			
 };

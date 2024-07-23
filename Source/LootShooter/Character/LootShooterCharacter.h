@@ -37,7 +37,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractiveAction;
 
-	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
@@ -45,11 +45,14 @@ private:
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _lastWeapon);
-
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
 public:
 	virtual void PostInitializeComponents() override;
 	
+	// 부모단에서 호출되는듯
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
+	// Weapon에 의해 호출됨
 	void SetOverlappingWeapon(AWeapon* _weapon);
 
 
@@ -64,9 +67,8 @@ public:
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& _value);
-
 	/** Called for looking input */
 	void Look(const FInputActionValue& _value);
-
+	/** Called for Interaction input */
 	void Interaction(const FInputActionValue& _value);
 };

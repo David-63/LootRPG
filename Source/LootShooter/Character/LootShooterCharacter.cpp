@@ -36,7 +36,7 @@ ALootShooterCharacter::ALootShooterCharacter()
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
 
-	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat"));
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
 
 }
@@ -47,22 +47,14 @@ void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME_CONDITION(ALootShooterCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
 
-// Called when the game starts or when spawned
 void ALootShooterCharacter::BeginPlay()
 {
-	Super::BeginPlay();
-	
+	Super::BeginPlay();	
 }
-
-// Called every frame
 void ALootShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
-
-// Called to bind functionality to input
 void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -82,14 +74,13 @@ void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		enhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		enhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Move);
 		enhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Look);
-		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Started, this, &ALootShooterCharacter::Interaction);
+		enhancedInputComponent->BindAction(InteractiveAction, ETriggerEvent::Triggered, this, &ALootShooterCharacter::Interaction);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
-
 void ALootShooterCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -122,7 +113,6 @@ void ALootShooterCharacter::Move(const FInputActionValue& _value)
 		AddMovementInput(rightDirection, movementVector.X);
 	}
 }
-
 void ALootShooterCharacter::Look(const FInputActionValue& _value)
 {
 	// input is a Vector2D
@@ -135,19 +125,40 @@ void ALootShooterCharacter::Look(const FInputActionValue& _value)
 		AddControllerPitchInput(lookAxisVector.Y);
 	}
 }
-
 void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
 {
+	// 서버에서만 작동해야함
+	if (Combat)
+	{
+		if (HasAuthority())
+		{
+			Combat->EquipWeapon(OverlappingWeapon);
+		}
+		else
+		{
+			ServerEquipButtonPressed();
+		}
+	}
+}
 
+void ALootShooterCharacter::ServerEquipButtonPressed_Implementation()
+{
+	if (Combat)
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
+	}
 }
 
 void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)
 {
+	// 멀티 플레이 환경에서 호출되므로
+	// 일단은 위젯을 끄고
 	if (OverlappingWeapon)
 	{
 		OverlappingWeapon->ShowPickupWidget(false);
 	}
 	OverlappingWeapon = _weapon;
+	// 폰을 제어중인 플레이어라면 보여주기
 	if (IsLocallyControlled())
 	{
 		if (OverlappingWeapon)
@@ -159,6 +170,7 @@ void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)
 
 void ALootShooterCharacter::OnRep_OverlappingWeapon(AWeapon* _lastWeapon)
 {
+	// 리슨서버만 호출되는듯
 	if (OverlappingWeapon)
 	{
 		OverlappingWeapon->ShowPickupWidget(true);

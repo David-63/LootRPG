@@ -30,8 +30,12 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 	EWeaponState WeaponState;
 
-	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_WeaponState, Category = "Weapon Properties")
 	class UWidgetComponent* PickupWidget;
+
+private:
+	UFUNCTION()
+	void OnRep_WeaponState();
 
 protected:
 	UFUNCTION()
@@ -40,8 +44,10 @@ protected:
 	void OnSphereEndOverlap(UPrimitiveComponent* _overlappedComponent, AActor* _otherActor, UPrimitiveComponent* _otherComponent, int32 _otherBodyIndex);
 
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
 	void ShowPickupWidget(bool _showWidget);
-
+	void SetWeaponState(EWeaponState _state);
+	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
 
 public:	
 	// Sets default values for this actor's properties

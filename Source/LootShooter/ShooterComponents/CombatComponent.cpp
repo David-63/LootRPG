@@ -3,39 +3,35 @@
 
 #include "CombatComponent.h"
 #include "LootShooter/Weapon/Weapon.h"
+#include "LootShooter/Character/LootShooterCharacter.h"
+#include "Engine/SkeletalMeshSocket.h"
+#include "Components/SphereComponent.h"
 
-// Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	// ...
 }
 
-
-// Called when the game starts
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
-
-
-// Called every frame
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* _weaponToEquip)
 {
-	if (nullptr == Character || nullptr == EquippedWeapon) return;
+	if (nullptr == Character || nullptr == _weaponToEquip) return;
 
+	EquippedWeapon = _weaponToEquip;
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	const USkeletalMeshSocket* handSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+	if (handSocket)
+	{
+		handSocket->AttachActor(EquippedWeapon, Character->GetMesh());
+	}
+	EquippedWeapon->SetOwner(Character);
 
 }

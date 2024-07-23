@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "LootShooter/Character/LootShooterCharacter.h"
-
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -15,7 +15,6 @@ AWeapon::AWeapon()
 	bReplicates = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
-	WeaponMesh->SetupAttachment(RootComponent);
 	SetRootComponent(WeaponMesh);
 	WeaponMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
 	WeaponMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
@@ -44,6 +43,7 @@ void AWeapon::BeginPlay()
 		AreaSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
 		AreaSphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
 	}
+	// 위젯 비활성 상태로 시작
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(false);
@@ -57,13 +57,41 @@ void AWeapon::Tick(float DeltaTime)
 
 }
 
+void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AWeapon, WeaponState);
+}
+
+void AWeapon::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		break;
+	}
+}
+
+void AWeapon::SetWeaponState(EWeaponState _state)
+{
+	WeaponState = _state;
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickupWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	}
+}
+
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* _overlappedComponent, AActor* _otherActor, UPrimitiveComponent* _otherComponent, int32 _otherBodyIndex, bool _bFromSweep, const FHitResult& _sweepResult)
 {
 	ALootShooterCharacter* lootShooterCharacter = Cast<ALootShooterCharacter>(_otherActor);
 	if (lootShooterCharacter)
 	{
 		lootShooterCharacter->SetOverlappingWeapon(this);
-		
 	}
 }
 
@@ -77,6 +105,10 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* _overlappedComponent, AAct
 	}
 }
 
+
+
+
+
 void AWeapon::ShowPickupWidget(bool _showWidget)
 {
 	if (PickupWidget)
@@ -84,3 +116,5 @@ void AWeapon::ShowPickupWidget(bool _showWidget)
 		PickupWidget->SetVisibility(_showWidget);
 	}
 }
+
+
