@@ -15,18 +15,20 @@ class LOOTSHOOTER_API ULootShooterAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 	
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Character", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "User Character", meta = (AllowPrivateAccess = "true"))
 	class ALootShooterCharacter* LootShooterCharacter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	float MoveSpeed;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool IsInAir;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool IsAccelerating;
 
+	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
+	bool IsWeaponEquipped;
 
 public:
 	virtual void NativeInitializeAnimation() override;

@@ -15,10 +15,12 @@ class LOOTSHOOTER_API UCombatComponent : public UActorComponent
 
 	friend class ALootShooterCharacter;
 private:
-	class ALootShooterCharacter*	Character;
-	AWeapon*						EquippedWeapon;
+	class ALootShooterCharacter* Character;
+	UPROPERTY(Replicated)
+	AWeapon* EquippedWeapon;
 
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
 	void EquipWeapon(AWeapon* _weaponToEquip);
 
 public:
@@ -27,5 +29,4 @@ protected:
 	virtual void BeginPlay() override;
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-			
 };

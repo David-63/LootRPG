@@ -45,16 +45,17 @@ private:
 private:
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(AWeapon* _lastWeapon);
+	// RPC (Remote Procedure Call) 클라이언트에서 서버로 호출하는 함수
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 public:
 	virtual void PostInitializeComponents() override;
 	
-	// 부모단에서 호출되는듯
+	// Replicated 변수를 사용하려면 반드시 등록해줘야함
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
 	// Weapon에 의해 호출됨
 	void SetOverlappingWeapon(AWeapon* _weapon);
-
+	bool IsWeaponEquipped();
 
 public:
 	ALootShooterCharacter();

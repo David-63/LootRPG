@@ -27,4 +27,5 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 	MoveSpeed = velocity.Size();
 	IsInAir = LootShooterCharacter->GetCharacterMovement()->IsFalling();
 	IsAccelerating = LootShooterCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.f ? true : false;
+	IsWeaponEquipped = LootShooterCharacter->IsWeaponEquipped();
 }

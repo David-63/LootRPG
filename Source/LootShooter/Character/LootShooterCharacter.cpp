@@ -15,20 +15,18 @@
 #include "LootShooter/Weapon/Weapon.h"
 #include "LootShooter/ShooterComponents/CombatComponent.h"
 
-// Sets default values
 ALootShooterCharacter::ALootShooterCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
-	CameraBoom->TargetArmLength = 250.f;
-	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->TargetArmLength = 250.f; // The camera follows at this distance behind the character
+	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	FollowCamera->bUsePawnControlRotation = false;
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -145,6 +143,7 @@ void ALootShooterCharacter::Interaction(const FInputActionValue& _value)
 
 void ALootShooterCharacter::ServerEquipButtonPressed_Implementation()
 {
+	// 서버에서 클라이언트로부터 요청받은 폰 객체(서버)에 오버랩 된 무기를 부착함 (클라이언트가 복사받은 폰이랑은 무관)
 	if (Combat)
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
@@ -168,6 +167,11 @@ void ALootShooterCharacter::SetOverlappingWeapon(AWeapon* _weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
+}
+
+bool ALootShooterCharacter::IsWeaponEquipped()
+{
+	return (Combat && Combat->EquippedWeapon);
 }
 
 void ALootShooterCharacter::OnRep_OverlappingWeapon(AWeapon* _lastWeapon)
