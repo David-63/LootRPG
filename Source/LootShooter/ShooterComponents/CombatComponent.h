@@ -16,15 +16,18 @@ class LOOTSHOOTER_API UCombatComponent : public UActorComponent
 	friend class ALootShooterCharacter;
 private:
 	class ALootShooterCharacter* Character;
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	AWeapon* EquippedWeapon;
 	UPROPERTY(Replicated)
 	bool bIsAiming;
+	
 
 protected:
 	void SetAiming(bool _bIsAiming);
 	UFUNCTION(Server, Reliable)
 	void ServerSetAiming(bool _bIsAiming);
+	UFUNCTION()
+	void OnRep_EquippedWeapon();
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& _outLifetimeProps) const override;
