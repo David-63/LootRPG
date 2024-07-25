@@ -35,18 +35,17 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 
 	// Offset yaw for strafing
 	FRotator aimRotation = LootShooterCharacter->GetBaseAimRotation();
-	UE_LOG(LogTemp, Display, TEXT("aimRot: %f"), aimRotation.Yaw);
 	FRotator movementRotation = UKismetMathLibrary::MakeRotFromX(LootShooterCharacter->GetVelocity());
-	UE_LOG(LogTemp, Display, TEXT("actor rotation: %f"), movementRotation.Yaw);
-	FRotator normalDeltaRotation = UKismetMathLibrary::NormalizedDeltaRotator(movementRotation, aimRotation);
-	DeltaRotation = FMath::RInterpTo(DeltaRotation, normalDeltaRotation, _deltaTime, 10.f);
+	FRotator normalRotatorDelta = UKismetMathLibrary::NormalizedDeltaRotator(movementRotation, aimRotation);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation, normalRotatorDelta, _deltaTime, 3.f);
 	YawOffset = DeltaRotation.Yaw;
-	UE_LOG(LogTemp, Display, TEXT("YawOffset : %f"), YawOffset);
 
+	// calulate CurrentLean
 	CharacterRotationLastFrame = CharacterRotation;
 	CharacterRotation = LootShooterCharacter->GetActorRotation();
-	const FRotator delta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
-	const float target = delta.Yaw / _deltaTime;
-	const float interp = FMath::FInterpTo(Lean, target, _deltaTime, 6.f);
-	Lean = FMath::Clamp(interp, -90.f, 90.f);
+	const FRotator rotateDelta = UKismetMathLibrary::NormalizedDeltaRotator(CharacterRotation, CharacterRotationLastFrame);
+	const float changedRotation = rotateDelta.Yaw / _deltaTime;
+	const float interpLean = FMath::FInterpTo(CurrentLean, changedRotation, _deltaTime, 5.f);
+	CurrentLean = FMath::Clamp(interpLean, -90.f, 90.f);
+
 }
