@@ -37,7 +37,7 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 	FRotator aimRotation = LootShooterCharacter->GetBaseAimRotation();
 	FRotator movementRotation = UKismetMathLibrary::MakeRotFromX(LootShooterCharacter->GetVelocity());
 	FRotator normalRotatorDelta = UKismetMathLibrary::NormalizedDeltaRotator(movementRotation, aimRotation);
-	DeltaRotation = FMath::RInterpTo(DeltaRotation, normalRotatorDelta, _deltaTime, 3.f);
+	DeltaRotation = FMath::RInterpTo(DeltaRotation, normalRotatorDelta, _deltaTime, 7.f);
 	YawOffset = DeltaRotation.Yaw;
 
 	// calulate CurrentLean

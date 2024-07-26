@@ -20,6 +20,11 @@ private:
 	AWeapon* EquippedWeapon;
 	UPROPERTY(Replicated)
 	bool bIsAiming;
+
+	UPROPERTY(EditAnywhere)
+	float BaseMoveSpeed;
+	UPROPERTY(EditAnywhere)
+	float AimMoveSpeed;
 	
 
 protected:
