@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "LootShooter/Weapon/Weapon.h"
 #include "LootShooter/ShooterComponents/CombatComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ALootShooterCharacter::ALootShooterCharacter()
 {
@@ -23,7 +24,7 @@ ALootShooterCharacter::ALootShooterCharacter()
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(GetMesh());
-	CameraBoom->TargetArmLength = 250.f; // The camera follows at this distance behind the character
+	CameraBoom->TargetArmLength = 65.f; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
@@ -56,6 +57,7 @@ void ALootShooterCharacter::BeginPlay()
 void ALootShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	AimOffset(DeltaTime);
 }
 void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -85,6 +87,7 @@ void ALootShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInp
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
 void ALootShooterCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -216,4 +219,30 @@ bool ALootShooterCharacter::IsWeaponEquipped()
 bool ALootShooterCharacter::IsAiming()
 {
 	return (Combat && Combat->bIsAiming);
+}
+
+void ALootShooterCharacter::AimOffset(float _deltaTime)
+{
+	if (Combat && nullptr == Combat->EquippedWeapon) return;
+
+	FVector velocity = GetVelocity();
+	velocity.Z = 0.f;
+	float moveSpeed = velocity.Size();
+	bool isInAir = GetCharacterMovement()->IsFalling();
+
+	if (0.f == moveSpeed && !isInAir) // standing still, not jumping
+	{
+		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, StartAimRotation);
+		AO_Yaw = deltaAimRotation.Yaw;
+		bUseControllerRotationYaw = false;
+	}
+	if (0.f < moveSpeed || isInAir) // running, or jumping
+	{
+		StartAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		AO_Yaw = 0.f;
+		bUseControllerRotationYaw = true;
+	}
+	
+	AO_Pitch = GetBaseAimRotation().Pitch;
 }

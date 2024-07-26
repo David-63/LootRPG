@@ -41,10 +41,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "User Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* AimAction;
 
+	/*
+	* weapon & combat
+	*/
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon;
 	UPROPERTY(VisibleAnywhere)
 	class UCombatComponent* Combat;
+
+
+	float AO_Yaw;
+	float AO_Pitch;
+	FRotator StartAimRotation;
 
 private:
 	UFUNCTION()
@@ -52,6 +60,10 @@ private:
 	// RPC (Remote Procedure Call) 클라이언트에서 서버로 호출하는 함수
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
+
+protected:
+	void AimOffset(float _deltaTime);
+
 public:
 	virtual void PostInitializeComponents() override;
 	
@@ -61,7 +73,8 @@ public:
 	void SetOverlappingWeapon(AWeapon* _weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
-
+	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
+	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 
 public:
 	ALootShooterCharacter();

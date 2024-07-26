@@ -48,4 +48,7 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 	const float interpLean = FMath::FInterpTo(CurrentLean, changedRotation, _deltaTime, 5.f);
 	CurrentLean = FMath::Clamp(interpLean, -90.f, 90.f);
 
+
+	AO_Yaw = LootShooterCharacter->GetAO_Yaw();
+	AO_Pitch = LootShooterCharacter->GetAO_Pitch();
 }
