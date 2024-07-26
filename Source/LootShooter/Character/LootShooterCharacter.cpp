@@ -245,4 +245,12 @@ void ALootShooterCharacter::AimOffset(float _deltaTime)
 	}
 	
 	AO_Pitch = GetBaseAimRotation().Pitch;
+	// 멀티환경에서 압축된 회전값을 복원함
+	if (90.f < AO_Pitch && !IsLocallyControlled())
+	{
+		// map pitch from [270, 360) to [-90, 0)
+		FVector2D inRange(270.f, 360.f);
+		FVector2D outRange(-90, 0);
+		AO_Pitch = FMath::GetMappedRangeValueClamped(inRange, outRange, AO_Pitch);
+	}
 }
