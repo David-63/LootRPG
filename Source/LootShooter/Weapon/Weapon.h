@@ -48,7 +48,7 @@ public:
 	void ShowPickupWidget(bool _showWidget);
 	void SetWeaponState(EWeaponState _state);
 	FORCEINLINE USphereComponent* GetAreaSphere() const { return AreaSphere; }
-
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 public:	
 	// Sets default values for this actor's properties
 	AWeapon();

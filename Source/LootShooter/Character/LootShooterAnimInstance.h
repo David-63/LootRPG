@@ -23,21 +23,20 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsInAir;
-
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsAccelerating;
-
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	bool bIsCrouched;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
 	bool bIsWeaponEquipped;
+	class AWeapon* EquipppedWeapon;
+
 	UPROPERTY(BlueprintReadOnly, Category = "User Arm", meta = (AllowPrivateAccess = "true"))
 	bool bIsAiming;
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	float YawOffset;
-
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	float CurrentLean;
 	
@@ -47,9 +46,11 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	float AO_Yaw;
-
 	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
 	float AO_Pitch;
+
+	UPROPERTY(BlueprintReadOnly, Category = "User IK", meta = (AllowPrivateAccess = "true"))
+	FTransform LeftHandTransform;
 
 public:
 	virtual void NativeInitializeAnimation() override;

@@ -221,6 +221,13 @@ bool ALootShooterCharacter::IsAiming()
 	return (Combat && Combat->bIsAiming);
 }
 
+AWeapon* ALootShooterCharacter::GetEquippedWeapon()
+{
+	if (nullptr == Combat) return nullptr;
+
+	return Combat->EquippedWeapon;
+}
+
 void ALootShooterCharacter::AimOffset(float _deltaTime)
 {
 	if (Combat && nullptr == Combat->EquippedWeapon) return;
@@ -234,6 +241,10 @@ void ALootShooterCharacter::AimOffset(float _deltaTime)
 	{
 		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, StartAimRotation);
+
+		//FVector2D inRange(0.f, 360.f);
+		//FVector2D outRange(10.f, 20.f);		
+		//AO_Yaw = FMath::GetMappedRangeValueClamped(inRange, outRange, deltaAimRotation.Yaw);
 		AO_Yaw = deltaAimRotation.Yaw;
 		bUseControllerRotationYaw = false;
 	}
