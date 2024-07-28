@@ -35,6 +35,8 @@ void ULootShooterAnimInstance::NativeUpdateAnimation(float _deltaTime)
 	EquipppedWeapon = LootShooterCharacter->GetEquippedWeapon();
 	bIsAiming = LootShooterCharacter->IsAiming();
 
+	TurningInPlace = LootShooterCharacter->GetTurningInPlace();
+
 	// Offset yaw for strafing
 	FRotator aimRotation = LootShooterCharacter->GetBaseAimRotation();
 	FRotator movementRotation = UKismetMathLibrary::MakeRotFromX(LootShooterCharacter->GetVelocity());

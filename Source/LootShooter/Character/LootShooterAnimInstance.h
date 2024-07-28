@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "LootShooter/LSTypes/TurningInPlace.h"
 #include "LootShooterAnimInstance.generated.h"
 
 /**
@@ -51,6 +52,10 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "User IK", meta = (AllowPrivateAccess = "true"))
 	FTransform LeftHandTransform;
+
+	UPROPERTY(BlueprintReadOnly, Category = "User Movement", meta = (AllowPrivateAccess = "true"))
+	ETurningInPlace TurningInPlace;
+
 
 public:
 	virtual void NativeInitializeAnimation() override;

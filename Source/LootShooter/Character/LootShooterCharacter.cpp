@@ -42,6 +42,8 @@ ALootShooterCharacter::ALootShooterCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 }
 
 void ALootShooterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -228,6 +230,18 @@ AWeapon* ALootShooterCharacter::GetEquippedWeapon()
 	return Combat->EquippedWeapon;
 }
 
+void ALootShooterCharacter::TurnInPlace(float _deltaTime)
+{
+	if (90.f < AO_Yaw)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Right;
+	}
+	else if (-90.f > AO_Yaw)
+	{
+		TurningInPlace = ETurningInPlace::ETIP_Left;
+	}
+}
+
 void ALootShooterCharacter::AimOffset(float _deltaTime)
 {
 	if (Combat && nullptr == Combat->EquippedWeapon) return;
@@ -241,20 +255,23 @@ void ALootShooterCharacter::AimOffset(float _deltaTime)
 	{
 		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, StartAimRotation);
-
-		//FVector2D inRange(0.f, 360.f);
-		//FVector2D outRange(10.f, 20.f);		
-		//AO_Yaw = FMath::GetMappedRangeValueClamped(inRange, outRange, deltaAimRotation.Yaw);
 		AO_Yaw = deltaAimRotation.Yaw;
 		bUseControllerRotationYaw = false;
+		TurnInPlace(_deltaTime);
 	}
 	if (0.f < moveSpeed || isInAir) // running, or jumping
 	{
 		StartAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		AO_Yaw = 0.f;
 		bUseControllerRotationYaw = true;
+		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 	}
 	
+
+	if (!IsLocallyControlled() && !HasAuthority())
+	{
+		UE_LOG(LogTemp, Display, TEXT("AO_Yaw: %f"), AO_Yaw);
+	}
 	AO_Pitch = GetBaseAimRotation().Pitch;
 	// 멀티환경에서 압축된 회전값을 복원함
 	if (90.f < AO_Pitch && !IsLocallyControlled())

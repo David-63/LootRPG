@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "LootShooter/LSTypes/TurningInPlace.h"
 #include "LootShooterCharacter.generated.h"
 
 class UInputMappingContext;
@@ -50,9 +51,13 @@ private:
 	class UCombatComponent* Combat;
 
 
+	/*
+	* AimOffset
+	*/
 	float AO_Yaw;
 	float AO_Pitch;
 	FRotator StartAimRotation;
+	ETurningInPlace TurningInPlace;
 
 private:
 	UFUNCTION()
@@ -60,7 +65,7 @@ private:
 	// RPC (Remote Procedure Call) 클라이언트에서 서버로 호출하는 함수
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
-
+	void TurnInPlace(float _deltaTime);
 protected:
 	void AimOffset(float _deltaTime);
 
@@ -76,6 +81,7 @@ public:
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	AWeapon* GetEquippedWeapon();
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 
 public:
 	ALootShooterCharacter();
