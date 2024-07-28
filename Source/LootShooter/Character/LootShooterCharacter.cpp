@@ -240,6 +240,18 @@ void ALootShooterCharacter::TurnInPlace(float _deltaTime)
 	{
 		TurningInPlace = ETurningInPlace::ETIP_Left;
 	}
+
+	if (ETurningInPlace::ETIP_NotTurning != TurningInPlace)
+	{
+		InterpAO_Yaw = FMath::FInterpTo(InterpAO_Yaw, 0.f, _deltaTime, 4.f);
+		AO_Yaw = InterpAO_Yaw;
+
+		if (15.f > FMath::Abs(AO_Yaw))
+		{
+			TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+			StartAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
+		}
+	}
 }
 
 void ALootShooterCharacter::AimOffset(float _deltaTime)
@@ -256,7 +268,11 @@ void ALootShooterCharacter::AimOffset(float _deltaTime)
 		FRotator currentAimRotation = FRotator(0.f, GetBaseAimRotation().Yaw, 0.f);
 		FRotator deltaAimRotation = UKismetMathLibrary::NormalizedDeltaRotator(currentAimRotation, StartAimRotation);
 		AO_Yaw = deltaAimRotation.Yaw;
-		bUseControllerRotationYaw = false;
+		if (ETurningInPlace::ETIP_NotTurning == TurningInPlace)
+		{
+			InterpAO_Yaw = AO_Yaw;
+		}
+		bUseControllerRotationYaw = true;
 		TurnInPlace(_deltaTime);
 	}
 	if (0.f < moveSpeed || isInAir) // running, or jumping
