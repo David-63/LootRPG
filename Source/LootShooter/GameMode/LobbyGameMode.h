@@ -16,4 +16,5 @@ class LOOTSHOOTER_API ALobbyGameMode : public AGameMode
 	
 public:
 	virtual void PostLogin(APlayerController* _newPlayer) override;
+	virtual void Logout(AController* _exiting) override;
 };
